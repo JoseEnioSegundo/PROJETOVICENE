@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: projetovicene
+    env: python
+    plan: starter
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn drive_project.wsgi --log-file -"
+    envVars:
+      - key: ALLOWED_HOSTS
+        value: projetovicene-1.onrender.com
+      - key: DEBUG
+        value: "False"
+      - key: SECRET_KEY
+        # don't commit secrets here; set the value in Render dashboard
+        sync: false

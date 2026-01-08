@@ -46,8 +46,17 @@ Deploy no Render (resumo)
    - Se for usar Postgres no Render, defina `DATABASE_URL` com a URL fornecida.
 3. Build command: `pip install -r requirements.txt`
 4. Start command: o `Procfile` já contém `web: gunicorn drive_project.wsgi --log-file -` (Render usa isso automaticamente).
-5. Não esqueça de habilitar (ou não) `DISABLE_COLLECTSTATIC` — por padrão o Render executa `collectstatic`, o app está configurado para funcionar com WhiteNoise.
+6. O Render por padrão executa `collectstatic` ao fazer deploy; não altere isso a menos que você saiba o que está fazendo. Se quiser pular `collectstatic`, defina `DISABLE_COLLECTSTATIC=True` nas variáveis de ambiente.
 
-Dicas
-- Para armazenar arquivos de mídia em produção, prefira S3 ou outro serviço de armazenamento e configure `DEFAULT_FILE_STORAGE`.
-- Consulte a documentação do Render para detalhes de banco de dados e variáveis de ambiente.
+Dicas e avisos importantes
+- **Arquivos de mídia (`MEDIA`) não são persistentes em instâncias Render**: se precisar de persistência, use S3 (ou outro serviço de armazenamento) e configure `DEFAULT_FILE_STORAGE` com `django-storages` e `boto3`.
+- **SECRET_KEY**: defina `SECRET_KEY` nas variáveis de ambiente do serviço no painel do Render (não commitá-la no repositório).
+- **Banco de dados**: prefira PostgreSQL (Render oferece Add-ons). Defina `DATABASE_URL` com a URL fornecida.
+
+Arquivos criados/alterados para deploy
+- `Procfile` — comando de start (`gunicorn`)
+- `runtime.txt` — versão do Python
+- `render.yaml` — arquivo de configuração exemplo para deploy no Render
+- `.env.example` — variáveis de exemplo para desenvolvimento/local
+
+Se quiser, eu posso adicionar suporte direto ao S3 (armazenamento de mídia) e gerar um `render.yaml` mais completo com Add-on Postgres configurado automaticamente.

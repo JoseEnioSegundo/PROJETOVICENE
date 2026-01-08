@@ -29,7 +29,8 @@ load_dotenv(BASE_DIR / ".env")
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-57y$u=(+r3@xi$m(%u3mrm5l0l45ybo2d$i0wv&z&qa^v6v0sw")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "yes")
+# Default to False for safety; set DEBUG=True in .env for local development
+DEBUG = os.environ.get("DEBUG", "False").lower() in ("true", "1", "yes")
 
 # Hosts permitidos (separados por vírgula em ALLOWED_HOSTS env var)
 ALLOWED_HOSTS = ["127.0.0.1", "localhost", "projetovicene-1.onrender.com"]
@@ -145,3 +146,56 @@ STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 # Media files (uploads)
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+# Default primary key field type
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# CSRF trusted origins (works well for Render and other hosts)
+CSRF_TRUSTED_ORIGINS = [f"https://{host}" for host in ALLOWED_HOSTS if host]
+
+# Production security defaults (applied when DEBUG is False)
+if not DEBUG:
+    # Warn if a weak/auto-generated SECRET_KEY is being used in production
+    if SECRET_KEY.startswith("django-insecure") or len(SECRET_KEY) < 50:
+        import warnings
+
+        warnings.warn(
+            "Weak SECRET_KEY in production: set SECRET_KEY env var to a secure value.",
+            RuntimeWarning,
+        )
+
+    # Redirect all HTTP to HTTPS (recommended behind proxy/load balancer)
+    SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "True").lower() in (
+        "true",
+        "1",
+        "yes",
+    )
+
+    # HSTS: enable for a short initial period; adjust `SECURE_HSTS_SECONDS`
+    SECURE_HSTS_SECONDS = int(os.environ.get("SECURE_HSTS_SECONDS", 3600))
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = os.environ.get(
+        "SECURE_HSTS_INCLUDE_SUBDOMAINS", "True"
+    ).lower() in ("true", "1", "yes")
+    SECURE_HSTS_PRELOAD = os.environ.get("SECURE_HSTS_PRELOAD", "True").lower() in (
+        "true",
+        "1",
+        "yes",
+    )
+
+    # Use secure cookies
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+
+# Optional S3 media storage (use `STORAGE_BACKEND=s3` to enable)
+if os.environ.get("STORAGE_BACKEND", "").lower() == "s3":
+    # django-storages
+    INSTALLED_APPS.append("storages")
+    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
+    AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
+    AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME")
+    AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME") or None
+    AWS_S3_CUSTOM_DOMAIN = os.environ.get("AWS_S3_CUSTOM_DOMAIN") or None
+    AWS_DEFAULT_ACL = None
+    if AWS_S3_CUSTOM_DOMAIN:
+        MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
