@@ -1,1 +1,1 @@
-web: gunicorn drive_project.wsgi --log-file -
+web: python manage.py migrate && gunicorn drive_project.wsgi --log-file -
