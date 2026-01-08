@@ -33,7 +33,12 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-57y$u=(+r3@xi$m(%u3mr
 DEBUG = os.environ.get("DEBUG", "False").lower() in ("true", "1", "yes")
 
 # Hosts permitidos (separados por vírgula em ALLOWED_HOSTS env var)
-ALLOWED_HOSTS = ["127.0.0.1", "localhost", "projetovicene-1.onrender.com"]
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "projetovicene-1.onrender.com",
+    "projetovicene.onrender.com",  # ADICIONADO para evitar Bad Request 400
+]
 if "ALLOWED_HOSTS" in os.environ:
     ALLOWED_HOSTS += os.environ["ALLOWED_HOSTS"].split(",")
 
