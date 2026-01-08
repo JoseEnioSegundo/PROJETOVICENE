@@ -32,7 +32,9 @@ SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-57y$u=(+r3@xi$m(%u3mr
 DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "yes")
 
 # Hosts permitidos (separados por vírgula em ALLOWED_HOSTS env var)
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS", "projetovicene-1.onrender.com").split(",")
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "projetovicene-1.onrender.com"]
+if "ALLOWED_HOSTS" in os.environ:
+    ALLOWED_HOSTS += os.environ["ALLOWED_HOSTS"].split(",")
 
 # Usado quando o app estiver atrás de proxy (Render)
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
