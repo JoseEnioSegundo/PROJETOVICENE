@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% block title %}❌ Excluir foto{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-12 col-sm-10 col-md-6 col-lg-5">
+    <div class="card p-4 text-center">
+
+      <h4 class="mb-3">🗑️ Excluir foto?</h4>
+
+      <p class="mb-4">
+        Tem certeza que deseja excluir a foto<br>
+        <strong>
+          {{ photo.title|default:"Momento especial 💙" }}
+        </strong>?
+      </p>
+
+      <form method="post">
+        {% csrf_token %}
+
+        <div class="d-grid gap-3">
+          <a href="{% url 'drive:index' %}" class="btn btn-secondary btn-lg">
+            ⬅️ Cancelar
+          </a>
+
+          <button type="submit" class="btn btn-danger btn-lg">
+            ❌ Excluir foto
+          </button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

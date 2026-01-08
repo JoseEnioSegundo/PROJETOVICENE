@@ -1,0 +1,241 @@
+{% extends 'base.html' %}
+{% block title %}🎂 Fotos do 1º Aninho do Vicente{% endblock %}
+
+{% block content %}
+
+<style>
+  :root {
+    --azul: #3b82f6;
+    --amarelo: #fde047;
+    --verde: #22c55e;
+    --rosa: #f9a8d4;
+  }
+
+  /* ===== FUNDO ===== */
+  .party-bg {
+    background: linear-gradient(135deg, #fef08a, #bfdbfe);
+    border-radius: 28px;
+    padding: 30px 20px 60px;
+  }
+
+  /* ===== HEADER ===== */
+  .party-header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+
+  .party-header h1 {
+    font-size: 2.6rem;
+    font-weight: 900;
+    color: var(--azul);
+  }
+
+  .party-header p {
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: #1e293b;
+  }
+
+  /* ===== PERSONAGENS (DESENHOS) ===== */
+  .header-characters {
+    position: relative;
+    height: 160px;
+    margin-bottom: 10px;
+  }
+
+  .header-characters img {
+    position: absolute;
+    width: 160px;
+  }
+
+  .header-characters .left { left: -20px; }
+  .header-characters .right { right: -20px; }
+
+  /* ===== UPLOAD ===== */
+  .upload-box {
+    background: #ffffff;
+    border-radius: 26px;
+    padding: 26px;
+    box-shadow: 0 14px 30px rgba(0,0,0,0.18);
+  }
+
+  .upload-btn {
+    background: linear-gradient(90deg, var(--verde), #4ade80);
+    border: none;
+    border-radius: 24px;
+    font-size: 1.3rem;
+    font-weight: 800;
+    padding: 16px;
+    color: #064e3b;
+  }
+
+  /* ===== GALERIA ===== */
+  .card {
+    border-radius: 24px;
+    border: none;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.15);
+    transition: transform 0.25s;
+    overflow: hidden;
+  }
+
+  .card:hover {
+    transform: translateY(-6px) scale(1.03);
+  }
+
+  /* 🔥 FOTOS SEM CORTE */
+  .card-img-top {
+    width: 100%;
+    height: auto;
+    max-height: 220px;
+    object-fit: contain;
+    background: #fff;
+  }
+
+  /* ===== MOBILE ===== */
+  @media (max-width: 768px) {
+    .header-characters {
+      height: 120px;
+    }
+
+    .header-characters img {
+      width: 110px;
+    }
+
+    .card-img-top {
+      max-height: 160px;
+    }
+  }
+
+  /* ===== MODAL ===== */
+  .modal-content {
+    background: radial-gradient(circle, var(--azul), #020617);
+  }
+
+  .nav-btn {
+    font-size: 2.4rem;
+    background: var(--amarelo);
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    border: none;
+  }
+</style>
+
+<div class="party-bg">
+
+  <!-- HEADER -->
+  <div class="party-header">
+    <div class="header-characters">
+      <img src="/static/looney/perna.png" class="left">
+      <img src="/static/looney/frajola.png" class="right">
+    </div>
+
+    <h1>🎉 Festa do Vicente! 🎉</h1>
+    <p>Envie suas fotos e ajude a guardar essas lembranças mágicas 💖</p>
+  </div>
+
+  <!-- UPLOAD -->
+  <div class="row justify-content-center mb-5">
+    <div class="col-12 col-sm-10 col-md-6 col-lg-4">
+      <div class="upload-box text-center">
+        <h4>📸 Enviar Foto</h4>
+
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+          {{ form.title.label_tag }} {{ form.title }}
+          {{ form.image.label_tag }} {{ form.image }}
+
+          <button
+            class="btn upload-btn w-100 mt-3"
+            onclick="soltarConfete()"
+          >
+            🎈 Enviar Foto
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- GALERIA -->
+  <h4 class="text-center mb-4">🖼️ Galeria da Festa</h4>
+
+  <div class="row g-4">
+    {% for photo in photos %}
+      <div class="col-6 col-sm-4 col-md-3 col-lg-3">
+        <div class="card h-100">
+          <img
+            src="{{ photo.image.url }}"
+            class="card-img-top"
+            style="cursor:pointer"
+            data-bs-toggle="modal"
+            data-bs-target="#imageModal"
+            data-index="{{ forloop.counter0 }}"
+          >
+          <div class="card-body text-center">
+            <h6 class="small text-truncate">
+              {{ photo.title|default:"Momento feliz 💕" }}
+            </h6>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-center">🎈 Nenhuma foto ainda!</p>
+    {% endfor %}
+  </div>
+
+</div>
+
+<!-- MODAL TELA CHEIA -->
+<div class="modal fade" id="imageModal" tabindex="-1">
+  <div class="modal-dialog modal-fullscreen">
+    <div class="modal-content">
+
+      <div class="modal-header border-0">
+        <button class="btn-close btn-close-white ms-auto" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body d-flex align-items-center justify-content-center position-relative">
+        <button class="nav-btn position-absolute start-0 ms-4" onclick="prevImage()">⬅️</button>
+        <img id="modalImage" class="img-fluid" style="max-height:90%;max-width:90%;">
+        <button class="nav-btn position-absolute end-0 me-4" onclick="nextImage()">➡️</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- CONFETE -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+<script>
+  function soltarConfete() {
+    confetti({
+      particleCount: 180,
+      spread: 90,
+      origin: { y: 0.6 },
+      colors: ['#3b82f6', '#fde047', '#22c55e', '#f9a8d4']
+    });
+  }
+
+  const images = Array.from(document.querySelectorAll('.card-img-top'));
+  let currentIndex = 0;
+  const modalImage = document.getElementById('modalImage');
+
+  document.getElementById('imageModal').addEventListener('show.bs.modal', e => {
+    const img = e.relatedTarget;
+    currentIndex = parseInt(img.dataset.index);
+    modalImage.src = images[currentIndex].src;
+  });
+
+  function nextImage() {
+    currentIndex = (currentIndex + 1) % images.length;
+    modalImage.src = images[currentIndex].src;
+  }
+
+  function prevImage() {
+    currentIndex = (currentIndex - 1 + images.length) % images.length;
+    modalImage.src = images[currentIndex].src;
+  }
+</script>
+
+{% endblock %}
