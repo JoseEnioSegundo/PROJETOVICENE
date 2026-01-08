@@ -1,8 +1,6 @@
-Django==6.0.1
-Pillow==12.1.0
-gunicorn==21.2.0
-whitenoise==6.5.0
-dj-database-url==1.0.0
-psycopg2-binary==2.9.11
-python-dotenv==1.0.0
-
+Django==5.2.10         # Compatível com Python 3.11 e LTS
+Pillow==12.1.0         # Para imagens
+gunicorn==21.2.0       # Servidor WSGI para produção
+whitenoise==6.5.0      # Serve arquivos estáticos
+dj-database-url==1.4.0 # Para ler DATABASE_URL do ambiente
+python-dotenv==1.0.0   # Para carregar .env localmente
